@@ -28,6 +28,12 @@ class DescribableTextures(DatasetBase):
             OxfordPets.save_split(train, val, test, self.split_path, self.image_dir)
 
         num_shots = cfg.DATASET.NUM_SHOTS
+        ### ADDITIONAL CODE ###
+        # Keep the original data for later use
+        t_train = train
+        t_val = val
+        t_test = test
+        ########################
         if num_shots >= 1:
             seed = cfg.SEED
             preprocessed = os.path.join(self.split_fewshot_dir, f"shot_{num_shots}-seed_{seed}.pkl")
@@ -45,11 +51,43 @@ class DescribableTextures(DatasetBase):
                 with open(preprocessed, "wb") as file:
                     pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
 
+        #### ADDITIONAL CODE ####
+        if num_shots <= -1:
+            # clustered few-shot
+            num_shots = num_shots * -1
+
+            seed = cfg.SEED
+            preprocessed = os.path.join(self.split_fewshot_dir, f"clus_shot_{num_shots}-seed_{seed}.pkl")
+            if os.path.exists(preprocessed):
+                print(f"Loading preprocessed few-shot data from {preprocessed}")
+                with open(preprocessed, "rb") as file:
+                    data = pickle.load(file)
+                    train, val = data["train"], data["val"]
+            else:
+                from fewshot_by_clustering import FewShotByClustering
+
+                fbc = FewShotByClustering(cfg)
+                train = fbc.generate_fewshot_dataset(train, num_shots=num_shots)
+                val = self.generate_fewshot_dataset(val, num_shots=min(num_shots, 4))
+                data = {"train": train, "val": val}
+                print(f"Saving preprocessed few-shot data to {preprocessed}")
+                with open(preprocessed, "wb") as file:
+                    pickle.dump(data, file, protocol=pickle.HIGHEST_PROTOCOL)
+        ##########################
         subsample = cfg.DATASET.SUBSAMPLE_CLASSES
-        train, val, test = OxfordPets.subsample_classes(train, val, test, subsample=subsample)
+        #train, val, test = OxfordPets.subsample_classes(train, val, test, subsample=subsample)
+        #### ADDITIONAL CODE ####
+        train, val, test = OxfordPets.subsample_classes(train, val, test, subsample=subsample, t_train=t_train)        
+        ##########################
 
         super().__init__(train_x=train, val=val, test=test)
 
+        #### ADDITIONAL CODE ####
+        ## Update the number of classes and class names in case of omitted classes by clustering
+        t_train, t_val, t_test = OxfordPets.subsample_classes(t_train, t_val, t_test, subsample=subsample)
+        self._num_classes = self.get_num_classes(t_train)
+        self._lab2cname, self._classnames = self.get_lab2cname(t_train)
+        ##########################
     @staticmethod
     def read_and_split_data(image_dir, p_trn=0.5, p_val=0.2, ignored=[], new_cnames=None):
         # The data are supposed to be organized into the following structure

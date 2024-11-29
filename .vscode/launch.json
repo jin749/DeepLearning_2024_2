@@ -1,0 +1,46 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Train CoOp",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/train.py",
+        "pythonPath": "/home/jsh/.conda/envs/coop/bin/python",
+        "args": [
+          "--root", "/hdd/hdd2/sch/DATA",
+          "--seed", "${input:seed}",
+          "--trainer", "CoOp",
+          "--dataset-config-file", "configs/datasets/${input:dataset}.yaml",
+          "--config-file", "configs/trainers/CoOp/${input:cfg}.yaml",
+          "--output-dir", "output/${input:dataset}/CoOp/${input:cfg}_${input:shots}shots/nctx16_cscFalse_ctpend/seed${input:seed}",
+          "TRAINER.COOP.N_CTX", "16",
+          "TRAINER.COOP.CSC", "False",
+          "TRAINER.COOP.CLASS_TOKEN_POSITION", "end",
+          "DATASET.NUM_SHOTS", "${input:shots}"
+        ]
+      }
+    ],
+    "inputs": [
+      {
+        "id": "dataset",
+        "type": "promptString",
+        "description": "Enter the dataset name"
+      },
+      {
+        "id": "cfg",
+        "type": "promptString",
+        "description": "Enter the config file name"
+      },
+      {
+        "id": "shots",
+        "type": "promptString",
+        "description": "Enter the number of shots (e.g., 1, 2, 4, 8, 16)"
+      },
+      {
+        "id": "seed",
+        "type": "promptString",
+        "description": "Enter the seed"
+      }
+    ]
+  }
