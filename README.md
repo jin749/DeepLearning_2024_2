@@ -1,3 +1,27 @@
+# 딥러닝 과제
+bash scripts/coop/cluster_main.sh {dataset} {n_shot} {seed}
+
+
+- {n_shot} > 0: *Do class-balanced n-shot sampling*
+- {n_shot} < 0: *Do n-shot sampling by k-means clustering*
+
+ex)
+```
+# 1*class_num 갯수만큼 클러스터 만들어서 샘플링
+bash scripts/coop/cluster_main.sh dtd -1 1 
+```
+
+최근 커밋의 수정 내역 보면 대충 감 올 거라고 생각합니다.
+모르는 것 있으면 언제든 물어봐주세요!
+
+테스트용으로 아래 경로에 트레이닝 데이터셋 예시 파일 만들어놨으니까, 테스트 해보시거나 지우셔도 됩니다.
+```
+# Training data for DTD drawn by clustering & class-guided features
+/hdd/hdd2/sch/DATA/dtd/split_fewshot/clus_shot_1-seed_1.pkl
+```
+
+
+
 # Prompt Learning for Vision-Language Models
 
 This repo contains the codebase of a series of research projects focused on adapting vision-language models like [CLIP](https://arxiv.org/abs/2103.00020) to downstream datasets via *prompt learning*:
