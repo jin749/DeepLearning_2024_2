@@ -17,7 +17,8 @@
           "TRAINER.COOP.N_CTX", "16",
           "TRAINER.COOP.CSC", "False",
           "TRAINER.COOP.CLASS_TOKEN_POSITION", "end",
-          "DATASET.NUM_SHOTS", "${input:shots}"
+          "DATASET.NUM_SHOTS", "${input:shots}",
+          "DATASET.SUBSAMPLE_CLASSES", "${input:sub}",
         ]
       }
     ],
@@ -41,6 +42,11 @@
         "id": "seed",
         "type": "promptString",
         "description": "Enter the seed"
+      },
+      {
+        "id": "sub",
+        "type": "promptString",
+        "description": "Enter the type of subset (e.g., 'all', 'base', 'new')"
       }
     ]
   }
