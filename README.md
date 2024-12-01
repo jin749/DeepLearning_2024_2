@@ -1,13 +1,13 @@
 # 딥러닝 과제
-bash scripts/coop/cluster_main.sh {dataset} {n_shot} {seed}
+bash scripts/coop/cluster_main.sh {dataset} {shot} {seed}
 
 
-- {n_shot} > 0: *Do class-balanced n-shot sampling*
-- {n_shot} < 0: *Do n-shot sampling by k-means clustering*
+- {shot} = n : *Do n-shot sampling consisting class-balanced samples*
+- {shot} = -n : *Do n-shot sampling by k-means clustering*
 
 ex)
 ```
-# 1*class_num 갯수만큼 클러스터 만들어서 샘플링
+# 1*class_num 갯수만큼 클러스터 만들어서 샘플링 후 CoOp 트레이닝
 bash scripts/coop/cluster_main.sh dtd -1 1 
 ```
 
@@ -17,7 +17,7 @@ bash scripts/coop/cluster_main.sh dtd -1 1
 테스트용으로 아래 경로에 트레이닝 데이터셋 예시 파일 만들어놨으니까, 테스트 해보시거나 지우셔도 됩니다.
 ```
 # Training data for DTD drawn by clustering & class-guided features
-/hdd/hdd2/sch/DATA/dtd/split_fewshot/clus_shot_1-seed_1.pkl
+/hdd/hdd2/sch/DATA/dtd/split_fewshot/clus_shot1_all-seed_1.pkl
 ```
 
 
