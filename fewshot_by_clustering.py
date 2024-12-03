@@ -73,8 +73,8 @@ class FewShotByClustering:
             print("Averaging image and text features")
             features = (image_features + text_features) / 2
         elif option == 3:
-            # method3: average image and class-buided text features
-            print("Averaging image and class-buided text features")
+            # method3: average image and class-guided text features
+            print("Averaging image and class-guided text features")
             target_text_features = self.get_text_features(list(range(0, len(self.classnames))))
             logits = self.clip_model.logit_scale.exp() * image_features @ target_text_features.t()
             probs = F.softmax(logits, dim=-1)
