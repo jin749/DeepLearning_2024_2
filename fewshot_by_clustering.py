@@ -56,7 +56,7 @@ class FewShotByClustering:
     @torch.no_grad()
     def sample_from_cluster(self, data_loader, num_shots):
         ground_labels, image_features = self.get_labels_and_features(data_loader)
-        text_features = self.get_text_features(ground_labels.tolist())
+        gt_text_features = self.get_text_features(ground_labels.tolist())
 
         option = 3
         cos_sim_distance = True
@@ -67,18 +67,23 @@ class FewShotByClustering:
         elif option == 1:
             # method1: concatenate image and text features
             print("Concatenating image and text features")
-            features = torch.cat((image_features, text_features), dim=1)
+            features = torch.cat((image_features, gt_text_features), dim=1)
         elif option == 2:
             # method2: average image and text features
             print("Averaging image and text features")
-            features = (image_features + text_features) / 2
+            features = (image_features + gt_text_features) / 2
         elif option == 3:
             # method3: average image and class-guided text features
             print("Averaging image and class-guided text features")
             target_text_features = self.get_text_features(list(range(0, len(self.classnames))))
             logits = self.clip_model.logit_scale.exp() * image_features @ target_text_features.t()
             probs = F.softmax(logits, dim=-1)
-            weighted_text_features = probs @ target_text_features
+
+            probs = probs.unsqueeze(1)
+            gt_text_features = gt_text_features.unsqueeze(1).expand(-1,len(self.classnames),-1)
+            weighted_text_features = probs @ gt_text_features
+            weighted_text_features = weighted_text_features.squeeze(1)
+
             features = (image_features + weighted_text_features) / 2
 
         if cos_sim_distance:
